@@ -1,0 +1,49 @@
+<!-- Load the jQuery and jQuery UI libraries. -->
+<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.10.0/jquery-ui.min.js"></script>
+
+<!-- Custom client-side JavaScript code. -->
+<script>
+  // When the page loads.
+  $(function() {
+    $('#btn_ok').click(saveConfig);
+    $('#btn_cancel').click(closeModal);
+  });
+
+
+
+  /**
+   * A function to check the settings and submit them to the server side
+   */
+
+  function saveConfig() {
+    var myKey=$('#key').val();
+    var mySecret=$('#secret').val();
+    if(myKey && mySecret) {
+      $('#btn_ok').prop('disabled', true);
+      var parameter={};
+      parameter.key=myKey;
+      parameter.secret=mySecret;
+      google.script.run.withSuccessHandler(function() {
+          google.script.host.close();
+        }).withFailureHandler(showError)
+          .configHandler(parameter);
+    } else {
+      window.alert('Please complete both key and secret before submitting');
+      $('#btn_ok').prop('disabled', false);
+    }
+  }
+
+
+  /**
+   * Logs an error message and shows an alert to the user.
+   */
+  function showError(error) {
+    console.log(error);
+    window.alert('An error has occurred, please try again.');
+  }
+  
+  function closeModal() {
+    google.script.host.close();
+  }
+</script>
