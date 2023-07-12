@@ -1,0 +1,143 @@
+<!-- Load the jQuery and jQuery UI libraries. -->
+<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.10.0/jquery-ui.min.js"></script>
+
+<!-- Custom client-side JavaScript code. -->
+<script>
+  /**
+   * A function to check the settings and submit them to the server side
+   */
+ 
+  function saveConfig() {
+    var myKey=$('#key').val();
+    var mySecret=$('#secret').val();
+    if(myKey && mySecret) {
+      $('#btnOK').prop('disabled', true);
+      var parameter={};
+      parameter.key=myKey;
+      parameter.secret=mySecret;
+      google.script.run.withSuccessHandler(function() {
+          google.script.host.close();
+        }).withFailureHandler(showError)
+          .configHandler(parameter);
+      
+    } else {
+      window.alert('Please complete both key and secret before submitting');
+      $('#btnOK').prop('disabled', false);
+    }
+  }
+
+
+  /**
+   * Logs an error message and shows an alert to the user.
+   */
+  function showError(error) {
+    console.log(error);
+    window.alert('An error has occurred, please try again.');
+    if (functionIsRunning) functionIsRunning=false;
+    $('[id^=btn_]').attr("disabled", false);
+  }
+
+  /**
+   * Closes the current dialog window
+   */
+   
+  function closeModal() {
+    google.script.host.close();
+  }
+  
+  /**
+   * Function to call the local or server functions based on function name in a string
+   */
+  
+  var functionIsRunning = false; //global function to make it accessible across functions.
+  
+  function functionCaller(event) {
+    var myE = {}
+    myE.parameter={}
+    $("[id^=frm_]").each(function(){
+      myE.parameter[$(this).attr('name')]=$(this).val();
+    });
+    console.log(myE)
+    if (functionIsRunning){
+      window.alert('A server call is still running. Please wait for it to complete');
+      return;
+    }
+    if (!event.data.func) {
+      console.log("no func passed on the event!");
+      console.log(event);
+      return;
+    }
+    switch(event.data.func) {
+      case 'closeModal':
+        closeModal();
+        break;
+      case 'menuCheckHandler':
+        functionIsRunning=true;
+        $('#'+event.data.btn).attr("disabled", true);
+        google.script.run.withFailureHandler(showError)
+          .withSuccessHandler(onSuccess)
+          .menuCheckHandler(myE);
+        break;
+      case 'menuDeleteHandler':
+        functionIsRunning=true;
+        $('#'+event.data.btn).attr("disabled", true);
+        google.script.run.withFailureHandler(showError)
+          .withSuccessHandler(onSuccess)
+          .menuDeleteHandler(myE);
+        break;
+      case 'menuSyncHandler':
+        functionIsRunning=true;
+        $('#'+event.data.btn).attr("disabled", true);
+        google.script.run.withFailureHandler(showError)
+          .withSuccessHandler(onSuccess)
+          .menuSyncHandler(myE);
+        break;      
+      case 'menuSubmitHandler':
+        functionIsRunning=true;
+        $('#'+event.data.btn).attr("disabled", true);
+        google.script.run.withFailureHandler(showError)
+          .withSuccessHandler(onSuccess)
+          .menuSubmitHandler(myE);
+        break;
+      case 'menuCreateHandler':
+        functionIsRunning=true;
+        $('#'+event.data.btn).attr("disabled", true);
+        google.script.run.withFailureHandler(showError)
+          .withSuccessHandler(onSuccess)
+          .menuCreateHandler(myE);
+        break;
+      default:
+        showError("Function name not found in table. Event data:\n"+event.data);
+        break;
+    }
+  }
+  
+  function onSuccess(response){
+    if (functionIsRunning) functionIsRunning=false;
+    $('[id^=btn_]').attr("disabled", false);
+    console.log(response);
+    if (response.btns){
+      for (var i=0; i<response.btns.length; i++){
+        $('#'+response.btns[i].btn).toggle(response.btns[i].visible);
+      }
+    }
+    if (response.msg){
+      $('#message').text(response.msg);
+    }
+    $('#output').val(response.output);
+    $('#frm_params').val(response.params);
+    
+//    function requestUpdate(msg, output, params) x``{
+//    Logger.log('requestUpdate : ' + [msg, output, params].join(':'));
+//    if(params !== null && params !== undefined && typeof params != 'string')
+//      params = Utilities.jsonStringify(params);
+//    var app={};
+//    if(msg)
+//      app.msg=msg;
+//    app.output=output || '';
+//    app.params=params || '';
+//    return app;
+//  }
+  }
+</script>
