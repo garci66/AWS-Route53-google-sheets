@@ -1,49 +1,48 @@
-<!-- Load the jQuery and jQuery UI libraries. -->
-<script src="https://code.jquery.com/jquery-1.8.3.min.js"></script>
-<script src="https://code.jquery.com/ui/1.10.0/jquery-ui.min.js"></script>
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= include('Stylesheet'); ?>
+  </head>
+  <body>
+    <div id='parentPanel' class='parentPanel'>
+    <div id='panel' class='topPanel'>
+      <div class='inputGroup'>
+        <div class='label' id='message'><?= myMsg ?></div>
+      </div>  
+      <? for (var i = 0; i < myFields.length; i++) { ?>
+        <div class='inputGroup'>
+          <div class='label'><?= myFields[i].label ?></div>
+          <input type='text' id='frm_<?= myFields[i].name ?>' name='<?= myFields[i].name ?>' class='formText' />
+        </div>
+      <? } ?>
+      <div class='inputGroup'>
+        <div class='label'>Output:</div>
+        <textarea id='output' name='output' class='output' style='height:150px;'></textarea>
+      </div>
+      <textarea id='frm_params' style='display:none;' name='params'><?= myParams?></textarea>
+    </div>
+    </div>
+    <div id='btnPanel' class='btnPanel'> 
+      <? for (var i = 0; i < myBtns.length; i++) { 
+           var buttonName = "btn_" + myBtns[i].label.replace(/\s/g, '').toLowerCase();
+           var buttonVisibility = myBtns[i].visible ? '':'display:none;';
+         ?>
+          <button id='<?= buttonName ?>' name='<?= buttonName ?>' style='<?!= buttonVisibility ?>' ><?= myBtns[i].label ?></button>
+      <? } ?>
+    </div>
+    <?!= include('requestJavascript'); ?>
+    <script>
+      // Template to generate the jQuery click bindings for the buttons.
+      $(function() {
+      <? for (var i = 0; i < myBtns.length; i++) { 
+           var buttonName = "btn_" + myBtns[i].label.replace(/\s/g, '').toLowerCase();
+         ?>
+          $('#<?= buttonName ?>').click({btn:<?=buttonName?>, func: <?=myBtns[i].func?>},functionCaller);
+      <? } ?>
+      });
+    </script>
+  </body>
+</html>
 
-<!-- Custom client-side JavaScript code. -->
-<script>
-  // When the page loads.
-  $(function() {
-    $('#btn_ok').click(saveConfig);
-    $('#btn_cancel').click(closeModal);
-  });
 
-
-
-  /**
-   * A function to check the settings and submit them to the server side
-   */
-
-  function saveConfig() {
-    var myKey=$('#key').val();
-    var mySecret=$('#secret').val();
-    if(myKey && mySecret) {
-      $('#btn_ok').prop('disabled', true);
-      var parameter={};
-      parameter.key=myKey;
-      parameter.secret=mySecret;
-      google.script.run.withSuccessHandler(function() {
-          google.script.host.close();
-        }).withFailureHandler(showError)
-          .configHandler(parameter);
-    } else {
-      window.alert('Please complete both key and secret before submitting');
-      $('#btn_ok').prop('disabled', false);
-    }
-  }
-
-
-  /**
-   * Logs an error message and shows an alert to the user.
-   */
-  function showError(error) {
-    console.log(error);
-    window.alert('An error has occurred, please try again.');
-  }
-  
-  function closeModal() {
-    google.script.host.close();
-  }
-</script>
