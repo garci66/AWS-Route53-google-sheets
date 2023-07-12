@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= include('Stylesheet'); ?>
+  </head>
+  <body>
+    <div id='panel' class='topPanel'>
+      <div class='inputGroup'>
+        <label for='key'>Access Key (required):</label>
+        <input type='text' name='key' id='key' class='formText'/>
+      </div>  
+      <div class='inputGroup'>
+        <label for='secret'>Secret Access Key (required):</label>
+        <input type='text' name='secret' id='secret' class='formText'/>
+      </div>  
+      <div class='statusMsg' style='color:red'/>
+    </div>
+    <div id='btnPanel' class='btnPanel'> 
+      <button id='btn_ok'> OK </button>
+      <button id='btn_cancel' > Cancel </button>
+    </div>
+    <?!= include('configJavascript'); ?>
+  </body>
+</html>
+
+
